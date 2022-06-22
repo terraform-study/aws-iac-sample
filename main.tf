@@ -39,6 +39,8 @@ module "vpc" {
   tags           = local.tags
   aws_az         = var.aws_az
   private_subnet = var.private_subnet
+  public_subnet  = var.public_subnet
+  db_subnet      = var.db_subnet
   vpc_cidr       = var.vpc_cidr
 }
 

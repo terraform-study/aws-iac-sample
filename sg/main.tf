@@ -6,6 +6,17 @@
 #   ]
 # }
 
+# resource "aws_security_group_rule" "allow_all" {
+#   count             = length(local.allow_tls)
+#   type              = "ingress"
+#   to_port           = local.allow_tls[count.index][0]
+#   from_port         = local.allow_tls[count.index][1]
+#   protocol          = local.allow_tls[count.index][2]
+#   cidr_blocks       = local.allow_tls[count.index][3]
+#   security_group_id = aws_security_group.allow_tls.id
+# }
+
+
 resource "aws_security_group" "allow_tls" {
   name        = "allow_tls"
   description = "Allow TLS inbound traffic"
@@ -39,14 +50,3 @@ resource "aws_security_group" "allow_tls" {
     Name = "allow_tls"
   })
 }
-
-# resource "aws_security_group_rule" "allow_all" {
-#   count             = length(local.allow_tls)
-#   type              = "ingress"
-#   to_port           = local.allow_tls[count.index][0]
-#   from_port         = local.allow_tls[count.index][1]
-#   protocol          = local.allow_tls[count.index][2]
-#   cidr_blocks       = local.allow_tls[count.index][3]
-#   security_group_id = aws_security_group.allow_tls.id
-# }
-

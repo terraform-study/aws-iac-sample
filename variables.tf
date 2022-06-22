@@ -18,6 +18,16 @@ variable "private_subnet" {
   default = ["10.0.10.0/24", "10.0.10.0/24"]
 }
 
+variable "public_subnet" {
+  type    = list(any)
+  default = ["10.0.20.0/24", "10.0.30.0/24"]
+}
+
+variable "db_subnet" {
+  type    = list(any)
+  default = ["10.0.40.0/24", "10.0.50.0/24"]
+}
+
 variable "sg_rule" {
   type = object({
     ingress = list(object({
