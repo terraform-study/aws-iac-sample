@@ -1,0 +1,5 @@
+# local status file
+.tfstate
+.tfstate*
+.terraform
+.terraform*
