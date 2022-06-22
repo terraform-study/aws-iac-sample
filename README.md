@@ -15,7 +15,7 @@ Terraform Cloud에서 원격으로 Plan, Apply를 진행하기 때문에 AWS cre
 ##### Direct tree
 ```bash
 .
-├── terraform.auto.tfvars
+├── terraform.auto.tfvars ## -var옵션을 주면 override합니다.
 ├── variables.tf
 ├── README.md
 ├── main.tf
@@ -59,6 +59,16 @@ role_arn = arn:aws:iam::******:role/******
 source_profile = default
 ```
 * Credentials은 위와 같이 교차 계정으로 처리했습니다. Default profile은 assume role만 가지고 있습니다.
+* Code에 Credentials을 하드코딩으로 작성하는것은 최대한 지양해야합니다.
+* profile의 정보를 가져오도록 작성하였고 workspace에 따라 환경을 분리하였습니다.(멀티계정의 경우)
+```hcl
+provider "aws" {
+  region  = var.region
+  alias   = "poc"
+  profile = terraform.workspace == "default" ? "poc" : terraform.workspace
+}
+```
+
 #### Terraform 명령
 
     1) terraform new workspace poc
