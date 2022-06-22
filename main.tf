@@ -53,4 +53,5 @@ module "security_group" {
   aws_az   = var.aws_az
   vpc_id   = module.vpc.vpc_id
   vpc_cidr = var.vpc_cidr
+  sg_rule  = var.sg_rule
 }
