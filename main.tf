@@ -38,6 +38,7 @@ module "vpc" {
 
   tags           = local.tags
   aws_az         = var.aws_az
+  aws_az_des     = var.aws_az_des
   private_subnet = var.private_subnet
   public_subnet  = var.public_subnet
   db_subnet      = var.db_subnet

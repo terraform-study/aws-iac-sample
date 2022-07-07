@@ -2,6 +2,12 @@ aws_az = [
   "ap-northeast-2a",
   "ap-northeast-2c"
 ]
+
+aws_az_des = [
+  "apn2a",
+  "apn2c"
+]
+
 region = "ap-northeast-2"
 
 vpc_cidr = "10.0.0.0/16"

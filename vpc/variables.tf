@@ -7,6 +7,11 @@ variable "aws_az" {
  default = ["ap-northeast-2a", "ap-northeast-2c"]
 }
 
+variable "aws_az_des" {
+ type = list
+ default = ["apn2a", "apn2c"]
+}
+
 variable "region" {
   type = string
   default = "ap-northeast-2"
