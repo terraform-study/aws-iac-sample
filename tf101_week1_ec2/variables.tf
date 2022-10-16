@@ -1,11 +1,10 @@
+variable "tags" {
+
+}
+
 variable "aws_az" {
   type    = list(any)
   default = ["ap-northeast-2a", "ap-northeast-2c"]
-}
-
-variable "aws_az_des" {
- type = list
- default = ["apn2a", "apn2c"]
 }
 
 variable "region" {
@@ -13,29 +12,46 @@ variable "region" {
   default = "ap-northeast-2"
 }
 
+variable "vpc_id" {
+  type = string
+}
+
+variable "public_subnet_id_0" {
+  type = string
+}
+
+variable "public_subnet_id_1" {
+  type = string
+}
+
+variable "private_subnet_id_0" {
+  type = string
+}
+
+variable "private_subnet_id_1" {
+  type = string
+}
+
+variable "db_subnet_id_0" {
+  type = string
+}
+
+variable "db_subnet_id_1" {
+  type = string
+}
+
 variable "vpc_cidr" {
-  type    = string
-  default = "10.0.0.0/16"
+  type = string
+}
+
+variable "tls_security_group_id" {
+  type = string
 }
 
 variable "tf101_server_port" {
-  type = number
-  default = 5000
-}
-
-variable "private_subnet" {
-  type    = list(any)
-  default = ["10.0.10.0/24", "10.0.10.0/24"]
-}
-
-variable "public_subnet" {
-  type    = list(any)
-  default = ["10.0.20.0/24", "10.0.30.0/24"]
-}
-
-variable "db_subnet" {
-  type    = list(any)
-  default = ["10.0.40.0/24", "10.0.50.0/24"]
+  description = "The port the server will use for HTTP requests"
+  type        = number
+  default     = 8080
 }
 
 variable "sg_rule" {
@@ -58,4 +74,3 @@ variable "sg_rule" {
     }))
   })
 }
- 

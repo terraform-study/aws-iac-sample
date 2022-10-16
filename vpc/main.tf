@@ -19,8 +19,8 @@ resource "aws_vpc_ipam_pool_cidr" "pool_cidr" {
 
 resource "aws_vpc" "terraform_module_vpc" {
   # cidr_block = var.vpc_cidr
-  ipv4_ipam_pool_id = aws_vpc_ipam_pool.pool.id
-  ipv4_netmask_length = 28
+  ipv4_ipam_pool_id   = aws_vpc_ipam_pool.pool.id
+  ipv4_netmask_length = 16
   depends_on = [
     aws_vpc_ipam_pool_cidr.pool_cidr
   ]
@@ -30,7 +30,7 @@ resource "aws_vpc" "terraform_module_vpc" {
   enable_dns_hostnames = "true"
 
   tags = merge(var.tags, {
-    Name        = "terraform_module_vpc"
+    Name = "terraform_module_vpc"
   })
 }
 
@@ -42,7 +42,7 @@ resource "aws_subnet" "private_subnet" {
   map_public_ip_on_launch = false
 
   tags = merge(var.tags, {
-    Name        = "SUB-Private-${var.aws_az_des[count.index]}"
+    Name = "SUB-Private-${var.aws_az_des[count.index]}"
   })
 }
 
@@ -54,7 +54,7 @@ resource "aws_subnet" "public_subnet" {
   map_public_ip_on_launch = false
 
   tags = merge(var.tags, {
-    Name        = "SUB-Public${var.aws_az_des[count.index]}"
+    Name = "SUB-Public${var.aws_az_des[count.index]}"
   })
 }
 
@@ -66,45 +66,57 @@ resource "aws_subnet" "db_subnet" {
   map_public_ip_on_launch = false
 
   tags = merge(var.tags, {
-    Name        = "SUB-DB-${var.aws_az_des[count.index]}"
+    Name = "SUB-DB-${var.aws_az_des[count.index]}"
   })
 }
 ## new line
 
 resource "aws_route_table" "rt_private_db" {
-  count = length(var.aws_az)
-  vpc_id = aws_vpc.terraform_module_vpc.id
-  depends_on = [ aws_nat_gateway.nat_gw ]
+  count      = length(var.aws_az)
+  vpc_id     = aws_vpc.terraform_module_vpc.id
+  depends_on = [aws_nat_gateway.nat_gw]
 
   tags = merge(var.tags, {
     Name = "RT-Db-${var.aws_az_des[count.index]}"
   })
 
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.nat_gw[count.index].id
   }
 }
 
+resource "aws_route_table_association" "rt_private_db_association" {
+  count          = length(aws_route_table.rt_private_db)
+  subnet_id      = element(aws_subnet.db_subnet.*.id, count.index)
+  route_table_id = element(aws_route_table.rt_private_db.*.id, count.index)
+}
+
 resource "aws_route_table" "rt_private_nat" {
-  count = length(var.aws_az)
-  vpc_id = aws_vpc.terraform_module_vpc.id
-  depends_on = [ aws_nat_gateway.nat_gw ]
+  count      = length(var.aws_az)
+  vpc_id     = aws_vpc.terraform_module_vpc.id
+  depends_on = [aws_nat_gateway.nat_gw]
 
   tags = merge(var.tags, {
     Name = "RT-Private-${var.aws_az_des[count.index]}"
   })
 
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.nat_gw[count.index].id
   }
 }
 
+resource "aws_route_table_association" "rt_private_nat_association" {
+  count          = length(aws_route_table.rt_private_nat)
+  subnet_id      = element(aws_subnet.private_subnet.*.id, count.index)
+  route_table_id = element(aws_route_table.rt_private_nat.*.id, count.index)
+}
+
 resource "aws_route_table" "rt_public_igw" {
-  count = length(var.aws_az)
-  vpc_id = aws_vpc.terraform_module_vpc.id
-  depends_on = [ aws_internet_gateway.igw ]
+  count      = length(var.aws_az)
+  vpc_id     = aws_vpc.terraform_module_vpc.id
+  depends_on = [aws_internet_gateway.igw]
 
   tags = merge(var.tags, {
     Name = "RT-Publuc-${var.aws_az_des[count.index]}"
@@ -116,10 +128,16 @@ resource "aws_route_table" "rt_public_igw" {
   }
 }
 
+resource "aws_route_table_association" "rt_public_igw_association" {
+  count          = length(aws_route_table.rt_public_igw)
+  subnet_id      = element(aws_subnet.public_subnet.*.id, count.index)
+  route_table_id = element(aws_route_table.rt_public_igw.*.id, count.index)
+}
+
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.terraform_module_vpc.id
 
-  tags = merge(var.tags,{
+  tags = merge(var.tags, {
     Name = "IGW-terraform-module-vpc"
   })
 }
@@ -129,17 +147,17 @@ resource "aws_internet_gateway" "igw" {
 resource "aws_eip" "eip_nat_gw" {
   count = length(var.aws_az)
 
-  tags = merge(var.tags,{
+  tags = merge(var.tags, {
     Name = "EIP-nat-gw-${count.index}"
   })
 }
 
 resource "aws_nat_gateway" "nat_gw" {
-  count = length(var.aws_az)
+  count         = length(var.aws_az)
   allocation_id = aws_eip.eip_nat_gw[count.index].id
-  subnet_id = aws_subnet.public_subnet[count.index].id
+  subnet_id     = aws_subnet.public_subnet[count.index].id
 
-  tags = merge(var.tags,{
+  tags = merge(var.tags, {
     Name = "NAT-gw-${var.aws_az_des[count.index]}"
   })
 }

@@ -22,3 +22,13 @@ output "private_subnet_id_1" {
     value = aws_subnet.private_subnet[1].id
     description = "subnet id 1"
 }
+
+output "db_subnet_id_0" {
+    value = aws_subnet.db_subnet[0].id
+    description = "subnet id 0"
+}
+
+output "db_subnet_id_1" {
+    value = aws_subnet.db_subnet[1].id
+    description = "subnet id 1"
+}
