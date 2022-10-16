@@ -1,5 +1,29 @@
+data "aws_region" "current" {}
+
+resource "aws_vpc_ipam" "terraform_ipam" {
+  operating_regions {
+    region_name = data.aws_region.current.name
+  }
+}
+
+resource "aws_vpc_ipam_pool" "pool" {
+  address_family = "ipv4"
+  ipam_scope_id  = aws_vpc_ipam.terraform_ipam.private_default_scope_id
+  locale         = data.aws_region.current.name
+}
+
+resource "aws_vpc_ipam_pool_cidr" "pool_cidr" {
+  ipam_pool_id = aws_vpc_ipam_pool.pool.id
+  cidr         = var.vpc_cidr
+}
+
 resource "aws_vpc" "terraform_module_vpc" {
-  cidr_block = var.vpc_cidr
+  # cidr_block = var.vpc_cidr
+  ipv4_ipam_pool_id = aws_vpc_ipam_pool.pool.id
+  ipv4_netmask_length = 28
+  depends_on = [
+    aws_vpc_ipam_pool_cidr.pool_cidr
+  ]
 
   instance_tenancy     = "default"
   enable_dns_support   = "true"
@@ -46,6 +70,21 @@ resource "aws_subnet" "db_subnet" {
   })
 }
 ## new line
+
+resource "aws_route_table" "rt_private_db" {
+  count = length(var.aws_az)
+  vpc_id = aws_vpc.terraform_module_vpc.id
+  depends_on = [ aws_nat_gateway.nat_gw ]
+
+  tags = merge(var.tags, {
+    Name = "RT-Db-${var.aws_az_des[count.index]}"
+  })
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat_gw[count.index].id
+  }
+}
 
 resource "aws_route_table" "rt_private_nat" {
   count = length(var.aws_az)

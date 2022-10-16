@@ -28,12 +28,19 @@ provider "aws" {
   profile = terraform.workspace == "default" ? "poc" : terraform.workspace
 }
 
+provider "aws" {
+  region = var.region
+  alias = "sso-org-root"
+  profile = terraform.workspace == "sso-org-root" ? "sso-org-root" : terraform.workspace
+  
+}
+
 
 module "vpc" {
   source = "./vpc"
 
   providers = {
-    aws = aws.poc
+    aws = aws.sso-org-root
   }
 
   tags           = local.tags
@@ -49,7 +56,7 @@ module "security_group" {
   source = "./sg"
 
   providers = {
-    aws = aws.poc
+    aws = aws.sso-org-root
   }
 
   tags     = local.tags
