@@ -2,6 +2,7 @@ data "aws_ssm_parameter" "amzn2_latest" {
   name = "/aws/service/ami-amazon-linux-latest/amzn2-ami-kernel-5.10-hvm-x86_64-gp2"
 }
 
+## amazon linux2 ami latest
 data "aws_ami" "amzn_latest" {
   most_recent = true
   owners      = ["amazon"] # Canonical
@@ -17,9 +18,10 @@ data "aws_ami" "amzn_latest" {
   }
 }
 
+## ubuntu ami latest
 data "aws_ami" "ubuntu_latest" {
   most_recent = true
-  owners      = ["099720109477"] # Canonical
+  owners      = ["099720109477"] # Canonical(owner account id)
 
   filter {
     name   = "name"

@@ -10,16 +10,22 @@ Terraform Cloud에서 원격으로 Plan, Apply를 진행하기 때문에 AWS cre
 
 #### Default Architecture
 ---
+[pluralith를 활용한 Visualise Terraform Infrastructure](https://www.pluralith.com/)
 예정
 
 ##### Direct tree
 ```bash
 .
 ├── terraform.auto.tfvars ## -var옵션을 주면 override합니다.
+├── terraform.auto.tfvars.json ## json type의 tfvars
 ├── variables.tf
 ├── README.md
-├── main.tf
-├── sg
+├── main.tf ## main
+├── tf101_week1_ec2 ## tf101 study 1주차
+│   ├── main.tf
+│   ├── output.tf
+│   └── variables.tf
+├── sg ## 공통 SG그룹 생성 모듈
 │   ├── main.tf
 │   ├── output.tf
 │   └── variables.tf
@@ -34,7 +40,10 @@ Terraform Cloud에서 원격으로 Plan, Apply를 진행하기 때문에 AWS cre
 ---
 **CLI 설치 필요**
 
+* aws cli v2
 * terraform
+* tfenv
+  * terraform cli version 관리 툴
 
 **Terraform Cloud 인증키 발급**
 
@@ -67,9 +76,16 @@ provider "aws" {
   alias   = "poc"
   profile = terraform.workspace == "default" ? "poc" : terraform.workspace
 }
-```
 
-#### Terraform 명령
+provider "aws" {
+  region  = var.region
+  alias   = "sso-org-root"
+  profile = terraform.workspace == "sso-org-root" ? "sso-org-root" : terraform.workspace
+}
+```
+* alias를 통해서 여러개의 provider를 지원하여 여러 모듈을 동시에 배포 및 관리할 수 있습니다.
+
+#### Terraform 명령 sample
 
     1) terraform new workspace poc
     2) terraform init

@@ -80,10 +80,10 @@ resource "aws_route_table" "rt_private_db" {
     Name = "RT-Db-${var.aws_az_des[count.index]}"
   })
 
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.nat_gw[count.index].id
-  }
+  # route {
+  #   cidr_block     = "0.0.0.0/0"
+  #   nat_gateway_id = aws_nat_gateway.nat_gw[count.index].id
+  # }
 }
 
 resource "aws_route_table_association" "rt_private_db_association" {
