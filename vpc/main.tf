@@ -42,7 +42,8 @@ resource "aws_subnet" "private_subnet" {
   map_public_ip_on_launch = false
 
   tags = merge(var.tags, {
-    Name = "SUB-Private-${var.aws_az_des[count.index]}"
+    Name                              = "SUB-Private-${var.aws_az_des[count.index]}"
+    "kubernetes.io/role/internal-elb" = 1
   })
 }
 
@@ -54,7 +55,8 @@ resource "aws_subnet" "public_subnet" {
   map_public_ip_on_launch = false
 
   tags = merge(var.tags, {
-    Name = "SUB-Public${var.aws_az_des[count.index]}"
+    Name                     = "SUB-Public${var.aws_az_des[count.index]}"
+    "kubernetes.io/role/elb" = 1
   })
 }
 
@@ -160,4 +162,34 @@ resource "aws_nat_gateway" "nat_gw" {
   tags = merge(var.tags, {
     Name = "NAT-gw-${var.aws_az_des[count.index]}"
   })
+}
+
+
+resource "aws_vpc_endpoint" "s3_gw_endpoint" {
+  vpc_id       = aws_vpc.terraform_module_vpc.id
+  service_name = "com.amazonaws.${var.region}.s3"
+
+  vpc_endpoint_type = "Gateway"
+
+  tags = merge(var.tags, {
+    Name = "VPCE-GW-s3-${aws_vpc.terraform_module_vpc.id}"
+  })
+}
+
+resource "aws_vpc_endpoint_route_table_association" "s3_gw_endpoint_private_db_rt" {
+  count           = length(aws_route_table.rt_private_db)
+  route_table_id  = element(aws_route_table.rt_private_db.*.id, count.index)
+  vpc_endpoint_id = aws_vpc_endpoint.s3_gw_endpoint.id
+}
+
+resource "aws_vpc_endpoint_route_table_association" "s3_gw_endpoint_private_nat_rt" {
+  count           = length(aws_route_table.rt_private_nat)
+  route_table_id  = element(aws_route_table.rt_private_nat.*.id, count.index)
+  vpc_endpoint_id = aws_vpc_endpoint.s3_gw_endpoint.id
+}
+
+resource "aws_vpc_endpoint_route_table_association" "s3_gw_endpoint_public_rt" {
+  count           = length(aws_route_table.rt_public_igw)
+  route_table_id  = element(aws_route_table.rt_public_igw.*.id, count.index)
+  vpc_endpoint_id = aws_vpc_endpoint.s3_gw_endpoint.id
 }

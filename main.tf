@@ -45,6 +45,7 @@ module "vpc" {
 
   tags           = local.tags
   aws_az         = var.aws_az
+  region         = var.region
   aws_az_des     = var.aws_az_des
   private_subnet = var.private_subnet
   public_subnet  = var.public_subnet
@@ -73,10 +74,10 @@ module "week1_ec2_web" {
     aws = aws.sso-org-root
   }
 
-  tags     = local.tags
-  aws_az   = var.aws_az
-  vpc_cidr = var.vpc_cidr
-  sg_rule  = var.sg_rule
+  tags              = local.tags
+  aws_az            = var.aws_az
+  vpc_cidr          = var.vpc_cidr
+  sg_rule           = var.sg_rule
   tf101_server_port = var.tf101_server_port
 
   vpc_id                = module.vpc.vpc_id

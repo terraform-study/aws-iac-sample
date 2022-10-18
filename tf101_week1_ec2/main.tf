@@ -41,8 +41,11 @@ resource "aws_instance" "tf101_instance" {
 
   user_data = <<-EOF
               #!/bin/bash
+              apt-get update -y
+              apt install apache2 -y
+              sudo sed -i "s/^Listen 80/Listen \${var.tf101_server_port}/g" /etc/apache2/ports.conf
+              sudo systemctl restart apache2.service
               echo "Hello, SAP Study" > index.html
-              nohup busybox httpd -f -p \${var.tf101_server_port} &
               EOF
 
   vpc_security_group_ids = [
