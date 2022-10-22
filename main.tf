@@ -89,3 +89,25 @@ module "week1_ec2_web" {
   db_subnet_id_1        = module.vpc.db_subnet_id_1
   tls_security_group_id = module.security_group.aws_security_group_id
 }
+
+module "week2_alb_asg" {
+  source = "./tf101_week2_asg"
+
+  providers = {
+    aws = aws.sso-org-root
+  }
+
+  tags              = local.tags
+  aws_az            = var.aws_az
+  vpc_cidr          = var.vpc_cidr
+  alb_rule           = var.alb_rule
+
+  vpc_id                = module.vpc.vpc_id
+  public_subnet_id_0    = module.vpc.public_subnet_id_0
+  public_subnet_id_1    = module.vpc.public_subnet_id_1
+  private_subnet_id_0   = module.vpc.private_subnet_id_0
+  private_subnet_id_1   = module.vpc.private_subnet_id_1
+  db_subnet_id_0        = module.vpc.db_subnet_id_0
+  db_subnet_id_1        = module.vpc.db_subnet_id_1
+
+}

@@ -75,3 +75,26 @@ sg_rule = {
     }
   ]
 }
+
+alb_rule = {
+  ingress = [
+    {
+      ranges_ipv4 = ["0.0.0.0/0"]
+      ranges_ipv6 = []
+      protocol    = "TCP"
+      to_ports    = 8008
+      from_ports  = 8008
+      desc        = "8008 Allow"
+    }
+  ]
+  "egress" = [
+    {
+      ranges_ipv4 = ["0.0.0.0/0"]
+      ranges_ipv6 = ["::/0"]
+      protocol    = "TCP"
+      to_ports    = 0
+      from_ports  = 0
+      desc        = "Outbound Allow"
+    }
+  ]
+}

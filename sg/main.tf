@@ -17,8 +17,8 @@
 # }
 
 
-resource "aws_security_group" "allow_tls" {
-  name        = "allow_tls"
+resource "aws_security_group" "common_allow_tls" {
+  name        = "common_allow_tls"
   description = "Allow TLS inbound traffic"
   vpc_id      = var.vpc_id
 
@@ -47,6 +47,6 @@ resource "aws_security_group" "allow_tls" {
   }
 
   tags = merge(var.tags, {
-    Name = "allow_tls"
+    Name = "common_allow_tls"
   })
 }
