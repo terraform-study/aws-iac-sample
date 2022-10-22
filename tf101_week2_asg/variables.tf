@@ -2,6 +2,14 @@ variable "tags" {
 
 }
 
+## Because it is used as an environment variable for shell scripts, a number type error occurs.
+variable "web_port" { 
+  type = number
+  # type = string
+  description = "ec2 web server port"
+  default = 80
+}
+
 variable "aws_az" {
   type    = list(any)
   default = ["ap-northeast-2a", "ap-northeast-2c"]

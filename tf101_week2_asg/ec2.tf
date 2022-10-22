@@ -16,7 +16,7 @@ data "aws_ami" "amzn2_latest" {
 resource "aws_launch_template" "tf101_week2_lc_sample" {
   name_prefix = "tf101-week2-lt-"
   image_id    = data.aws_ami.amzn2_latest.id
-
+  # default_version = 2
   block_device_mappings {
     device_name = "/dev/sda1"
 
@@ -27,11 +27,22 @@ resource "aws_launch_template" "tf101_week2_lc_sample" {
       iops        = 3000
     }
   }
+
+  block_device_mappings {
+    device_name = "/dev/xvda"
+
+    ebs {
+      volume_size = 50
+      volume_type = "gp3"
+      throughput  = 125
+      iops        = 3000
+    }
+  }
   # instance_type          = "t3.medium"
   vpc_security_group_ids = [aws_security_group.ec2_tg.id]
-  network_interfaces {
-    associate_public_ip_address = false
-  }
+  # network_interfaces {
+  #   associate_public_ip_address = false
+  # }
 
   monitoring {
     enabled = true
@@ -41,8 +52,16 @@ resource "aws_launch_template" "tf101_week2_lc_sample" {
     arn = aws_iam_instance_profile.access_ssm_allow.arn
   }
 
-
-  user_data = filebase64("${path.module}/tf101_week2_lc_ec2.sh")
+  # If do not enter an environment variable, it is possible import and use the shell file
+  # user_data = filebase64("${path.module}/tf101_week2_lc_ec2.sh")
+  user_data = base64encode(
+    templatefile(
+      "${path.module}/tf101_week2_lc_ec2.sh",
+      {
+        port = var.web_port
+      }
+    )
+  )
 
   # Required when using a launch configuration with an auto scaling group.
   lifecycle {
@@ -52,4 +71,11 @@ resource "aws_launch_template" "tf101_week2_lc_sample" {
   tags = merge(var.tags, {
     Name = "tf101_week2_lc_sample"
   })
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = merge(var.tags, {
+      asg = "tf101_week2_lc_sample_create"
+    })
+  }
 }

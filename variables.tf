@@ -4,8 +4,8 @@ variable "aws_az" {
 }
 
 variable "aws_az_des" {
- type = list
- default = ["apn2a", "apn2c"]
+  type    = list(any)
+  default = ["apn2a", "apn2c"]
 }
 
 variable "region" {
@@ -19,7 +19,7 @@ variable "vpc_cidr" {
 }
 
 variable "tf101_server_port" {
-  type = number
+  type    = number
   default = 5000
 }
 
