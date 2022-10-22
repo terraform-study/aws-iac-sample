@@ -6,3 +6,4 @@
 *.tfstate
 terraform.tfstate
 terraform.tfstate.backup
+.pluralith
