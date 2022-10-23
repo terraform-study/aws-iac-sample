@@ -7,6 +7,8 @@ Terraform 사용 방법을 학습하기 위한 각종 서비스 Resource를 모�
 
 Terraform Cloud에서 원격으로 Plan, Apply를 진행하기 때문에 AWS credentials 정보가 필요합니다. 좀더 보안적으로 관리할 방법 확인이 필요합니다.
 
+다만 Terraform은 null처리에 대한 내용이 명확하지 않습니다. 내부의 optional 객체와 같은 형태로 구성되어 있기 때문에 애초에 null 자체를 허용하지 않습니다. 경우에 따라 null 입력 등에 대한 처리가 필요하기에 cdktf로 추후 마이그레이션 예정입니다.
+
 
 #### Default Architecture
 ---
@@ -224,9 +226,9 @@ Global options (use these before the subcommand, if any):
 ```
 
 **TO-DO List**
-```bash
-#서비스 Infra 구성 후, 필요한 경우, [Launch Config 백업] 및 [기타 Alarm 생성] 등을 수행한다
-#EKS의 경우 Launch Template를 사용하는 경우 별도 작업이 필요합니다
-#EKS Cluster에 Ingress를 연결하기 위해선 eksctl을 통해 별도 작업이 필요합니다
-   #아직 cdk처럼 eks resource를 하나의 파이프라인으로 만들수 없습니다. 프로바이더를 변경하여 작업이 가능합니다
-```
+
+- [ ] EKS launch_template 생성
+- [ ] EKS Cluster 생성
+- [ ] IRSA 구성
+- [ ] 기본 서비스 배포
+- [ ] cdktf로 컨버팅
