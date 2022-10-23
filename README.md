@@ -22,7 +22,7 @@ Terraform Cloud에서 원격으로 Plan, Apply를 진행하기 때문에 AWS cre
 ├── README.md
 ├── main.tf ## main
 ├── tf101_week2_asg ## tf101 study 2주차 alb와 asg, ec2를 활용한 간단한 웹 서버를 배포합니다.
-│   ├── ec2.tf
+│   ├── launch_template.tf
 │   ├── iam.tf
 │   ├── asg.tf
 │   ├── alb.tf
@@ -83,12 +83,34 @@ tfenv use <version>
 
 **Terraform Cloud 인증키 발급**
 
+terraform status를 관리하기위하여 두가지 방식을 설정 해보고자 합니다.
+1. terraform cloud
+2. AWS s3, DynamoDB
+
+우선 Terraform Cloud는 일부 무료로 어느정도 이용이 가능합니다. 세팅에 따라 클라우드 상에서 파이프라인을 구동할 수 있습니다(remote 옵션을 주어 Terraform Cloud에서 plan과 apply가 가능합니다). 이 기능은 git과 연동되어 특정 브런치에 push가 발생하면 수행하도록 처리 할 수 있습니다.
+해당 workspace의 settings로 가서 Execution Mode와 Apply Method를 수정하여 적절하게 자동화 할 수 있습니다.
+
+```bash
+#terrafform cloud backend
+terraform {
+  backend "remote" {
+    organization = "mate-sample"
+
+    workspaces {
+      name = "aws-iac-sample"
+    }
+  }
+}
+```
+
 ```bash
 ## 테라폼 로그인을 통하여 cloud 인증 토큰을 받아와 로컬 PC에 저장합니다.(추후 진행)
 terraform login
 
 ## AWS configure를 설정합니다.
 aws configure
+## AWS SSO를 사용하는 경우
+aws sso login --profile <profile name>
 ```
 
 **AWS credentials 발급**

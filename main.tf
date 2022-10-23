@@ -13,6 +13,17 @@ locals {
   }
 }
 
+#terrafform cloud backend
+# terraform {
+#   backend "remote" {
+#     organization = "mate-sample"
+
+#     workspaces {
+#       name = "aws-iac-sample"
+#     }
+#   }
+# }
+
 terraform {
   required_providers {
     aws = {
