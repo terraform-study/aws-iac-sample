@@ -87,6 +87,7 @@ terraform status를 관리하기위하여 두가지 방식을 설정 해보고�
 1. terraform cloud
 2. AWS s3, DynamoDB
 
+**1. Terraform Cloud**
 우선 Terraform Cloud는 일부 무료로 어느정도 이용이 가능합니다. 세팅에 따라 클라우드 상에서 파이프라인을 구동할 수 있습니다(remote 옵션을 주어 Terraform Cloud에서 plan과 apply가 가능합니다). 이 기능은 git과 연동되어 특정 브런치에 push가 발생하면 수행하도록 처리 할 수 있습니다.
 해당 workspace의 settings로 가서 Execution Mode와 Apply Method를 수정하여 적절하게 자동화 할 수 있습니다.
 
@@ -112,6 +113,7 @@ aws configure
 ## AWS SSO를 사용하는 경우
 aws sso login --profile <profile name>
 ```
+**2. S3, DynamoDB**
 
 **AWS credentials 발급**
 
@@ -144,6 +146,8 @@ provider "aws" {
 * alias를 통해서 여러개의 provider를 지원하여 여러 모듈을 동시에 배포 및 관리할 수 있습니다.
 
 #### Terraform 명령 sample
+**자주 사용하는 명령어 정리**
+
     1) pluralith plan
        1) pluralith를 사용하여 생성될 Architecture를 도식화 합니다
     2) terraform init
@@ -165,15 +169,21 @@ provider "aws" {
        3) 모든 리소스 생성후 꼭 삭제해주셔야 합니다.
     10) terraform destroy --target module.week2_alb_asg --auto-approve
        4) 일부 리소스를 재 생성해야 하는경우 모듈만 별도로 삭제후 apply 진행할 수 있습니다.
-   
-    # 서비스 Infra 구성 후, 필요한 경우, [Launch Config 백업] 및 [기타 Alarm 생성] 등을 수행한다.
-    # EKS의 경우 Launch Template를 사용하는 경우 별도 작업이 필요합니다.
-    # EKS Cluster에 Ingress를 연결하기 위해선 eksctl을 통해 별도 작업이 필요합니다.
-        아직 cdk처럼 eks resource를 하나의 파이프라인으로 만들수 없습니다. 프로바이더를 변경하여 작업이 가능합니다
 
+**Terraform Cloud 백엔드 생성**
+```bash
+# terraform cloud 로그인후 다른 backend로 변경하려는 경우
+# 아래와 같이 입력하면 이전에 설정한 state를 local로 다시 마이그레이션 합니다
+terraform init -migrate-state
+# 아래의 명령어를 입력하면 local에 다시 state를 생성합니다
+# 삭제후 아래의 명령어를 입력하면 문제 없으나 이미 생성되어 있는 리소스가 있는 상태에서 아래의 명령어를 입력하면 충돌이 발생합니다
+terraform init -reconfigure
+```
+
+**terraform -help 명령어 옵션 설명**
 
 ```bash
-terraform -help
+
 Usage: terraform [global options] <subcommand> [args]
 
 The available commands for execution are listed below.
@@ -211,4 +221,12 @@ Global options (use these before the subcommand, if any):
                 given subcommand.
   -help         Show this help output, or the help for a specified subcommand.
   -version      An alias for the "version" subcommand.
+```
+
+**TO-DO List**
+```bash
+#서비스 Infra 구성 후, 필요한 경우, [Launch Config 백업] 및 [기타 Alarm 생성] 등을 수행한다
+#EKS의 경우 Launch Template를 사용하는 경우 별도 작업이 필요합니다
+#EKS Cluster에 Ingress를 연결하기 위해선 eksctl을 통해 별도 작업이 필요합니다
+   #아직 cdk처럼 eks resource를 하나의 파이프라인으로 만들수 없습니다. 프로바이더를 변경하여 작업이 가능합니다
 ```
