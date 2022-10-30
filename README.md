@@ -52,7 +52,7 @@ Terraform Cloud에서 원격으로 Plan, Apply를 진행하기 때문에 AWS cre
 ### Requirement
 
 ---
-#####CLI 설치 필요
+##### CLI 설치 필요
 
 * aws cli v2
   * ```brew install awscli```
@@ -60,7 +60,7 @@ Terraform Cloud에서 원격으로 Plan, Apply를 진행하기 때문에 AWS cre
 * tfenv
   * terraform cli version 관리 툴
 
-#####Install
+##### Install
 This is the official guide for terraform binary installation. Please visit this [Install Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli) website and follow the instructions.
 
 Or, you can manually get a specific version of terraform binary from the websiate. Move to the [Downloads](https://www.terraform.io/downloads.html) page and look for the appropriate package for your system. Download the selected zip archive package. Unzip and install terraform by navigating to a directory included in your system's `PATH`.
@@ -88,13 +88,13 @@ tfenv install latest
 tfenv use <version>
 ```
 
-###Terraform Cloud 인증키 발급
+### Terraform Cloud 인증키 발급
 
 terraform status를 관리하기위하여 두가지 방식을 설정 해보고자 합니다.
 1. terraform cloud
 2. AWS s3, DynamoDB
 
-#####1. Terraform Cloud
+##### 1. Terraform Cloud
 우선 Terraform Cloud는 일부 무료로 어느정도 이용이 가능합니다. 세팅에 따라 클라우드 상에서 파이프라인을 구동할 수 있습니다(remote 옵션을 주어 Terraform Cloud에서 plan과 apply가 가능합니다). 이 기능은 git과 연동되어 특정 브런치에 push가 발생하면 수행하도록 처리 할 수 있습니다.
 해당 workspace의 settings로 가서 Execution Mode와 Apply Method를 수정하여 적절하게 자동화 할 수 있습니다.
 
@@ -120,7 +120,7 @@ aws configure
 ## AWS SSO를 사용하는 경우
 aws sso login --profile <profile name>
 ```
-#####2. S3, DynamoDB
+##### 2. S3, DynamoDB
 S3를 Backend로 사용하는 경우 아래와 같은 설정으로 tfstate 파일 저장이 가능하다. s3의 prefix는 [bucket_name]/env:/[workspace_name]]/terraform/aws-iac-study/terraform.tfstate 형태로 만들어진다. 다만, s3만 사용하는경우 lock을 관리할수 없기 때문에 DynamoDB와 함께 사용이 가능하다.
 ```bash
  backend "s3" {
@@ -133,7 +133,7 @@ S3를 Backend로 사용하는 경우 아래와 같은 설정으로 tfstate 파�
   }
 ```
 
-###AWS credentials 발급
+### AWS credentials 발급
 
 * 전체 리소스를 생성하기 때문에 우선 Administrator 권한으로 진행하겠습니다
 ```bash
