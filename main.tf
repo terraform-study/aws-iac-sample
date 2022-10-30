@@ -13,17 +13,6 @@ locals {
   }
 }
 
-#terrafform cloud backend
-# terraform {
-#   backend "remote" {
-#     organization = "mate-sample"
-
-#     workspaces {
-#       name = "aws-iac-sample"
-#     }
-#   }
-# }
-
 terraform {
   required_providers {
     aws = {
@@ -31,8 +20,23 @@ terraform {
       version = "~> 3.0"
     }
   }
-}
+  #terrafform cloud backend
+  #   backend "remote" {
+  #     organization = "mate-sample"
 
+  #     workspaces {
+  #       name = "aws-iac-sample"
+  #     }
+  #   }
+  backend "s3" {
+    bucket         = "mate-backend-tf101-sewoong"
+    key            = "terraform/aws-iac-study/terraform.tfstate"
+    region         = "ap-northeast-2"
+    encrypt        = true
+    profile        = "sso-org-root"
+    dynamodb_table = "terraform-lock-table"
+  }
+}
 provider "aws" {
   region  = var.region
   alias   = "poc"
