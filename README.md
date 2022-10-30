@@ -1,6 +1,6 @@
 # Terraform AWS Infra Script
 
-#### Introduction
+### Introduction
 
 ---
 Terraform 사용 방법을 학습하기 위한 각종 서비스 Resource를 모듈로 나누어 구성합니다. 백엔드는 현재 Local로 각 환경에서 관리하고 추후 Terraform Cloud와 Github을 통합하여 tfstate와 version control을 해보려 합니다.
@@ -10,7 +10,7 @@ Terraform Cloud에서 원격으로 Plan, Apply를 진행하기 때문에 AWS cre
 다만 Terraform은 null처리에 대한 내용이 명확하지 않습니다. 내부의 optional 객체와 같은 형태로 구성되어 있기 때문에 애초에 null 자체를 허용하지 않습니다. 경우에 따라 null 입력 등에 대한 처리가 필요하기에 cdktf로 추후 마이그레이션 예정입니다.
 
 
-#### Default Architecture
+### Default Architecture
 ---
 [pluralith를 활용한 Visualise Terraform Infrastructure](https://www.pluralith.com/)
 예정
@@ -22,7 +22,12 @@ Terraform Cloud에서 원격으로 Plan, Apply를 진행하기 때문에 AWS cre
 ├── terraform.auto.tfvars.json ## json type의 tfvars
 ├── variables.tf
 ├── README.md
-├── main.tf ## main
+├── main.tf ## main(global의 상태를 가져와서 data로 사용 가능한지 테스트를 해 보자...)
+├── global ## backend를 위한 s3, dynamoDB 생성용 폴더(not module)
+│   ├── main.tf
+│   ├── output.tf
+│   └── variables.tf
+├── tf101_week3_rds ## 개발중...
 ├── tf101_week2_asg ## tf101 study 2주차 alb와 asg, ec2를 활용한 간단한 웹 서버를 배포합니다.
 │   ├── launch_template.tf
 │   ├── iam.tf
@@ -44,10 +49,10 @@ Terraform Cloud에서 원격으로 Plan, Apply를 진행하기 때문에 AWS cre
     └── variables.tf
 ```
 
-#### Requirement
+### Requirement
 
 ---
-**CLI 설치 필요**
+#####CLI 설치 필요
 
 * aws cli v2
   * ```brew install awscli```
@@ -55,7 +60,7 @@ Terraform Cloud에서 원격으로 Plan, Apply를 진행하기 때문에 AWS cre
 * tfenv
   * terraform cli version 관리 툴
 
-**Install**
+#####Install
 This is the official guide for terraform binary installation. Please visit this [Install Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli) website and follow the instructions.
 
 Or, you can manually get a specific version of terraform binary from the websiate. Move to the [Downloads](https://www.terraform.io/downloads.html) page and look for the appropriate package for your system. Download the selected zip archive package. Unzip and install terraform by navigating to a directory included in your system's `PATH`.
@@ -83,13 +88,13 @@ tfenv install latest
 tfenv use <version>
 ```
 
-**Terraform Cloud 인증키 발급**
+###Terraform Cloud 인증키 발급
 
 terraform status를 관리하기위하여 두가지 방식을 설정 해보고자 합니다.
 1. terraform cloud
 2. AWS s3, DynamoDB
 
-**1. Terraform Cloud**
+#####1. Terraform Cloud
 우선 Terraform Cloud는 일부 무료로 어느정도 이용이 가능합니다. 세팅에 따라 클라우드 상에서 파이프라인을 구동할 수 있습니다(remote 옵션을 주어 Terraform Cloud에서 plan과 apply가 가능합니다). 이 기능은 git과 연동되어 특정 브런치에 push가 발생하면 수행하도록 처리 할 수 있습니다.
 해당 workspace의 settings로 가서 Execution Mode와 Apply Method를 수정하여 적절하게 자동화 할 수 있습니다.
 
@@ -115,9 +120,20 @@ aws configure
 ## AWS SSO를 사용하는 경우
 aws sso login --profile <profile name>
 ```
-**2. S3, DynamoDB**
+#####2. S3, DynamoDB
+S3를 Backend로 사용하는 경우 아래와 같은 설정으로 tfstate 파일 저장이 가능하다. s3의 prefix는 [bucket_name]/env:/[workspace_name]]/terraform/aws-iac-study/terraform.tfstate 형태로 만들어진다. 다만, s3만 사용하는경우 lock을 관리할수 없기 때문에 DynamoDB와 함께 사용이 가능하다.
+```bash
+ backend "s3" {
+    bucket         = "[bucket_name]"
+    key            = "terraform/aws-iac-study/terraform.tfstate"
+    region         = "ap-northeast-2"
+    encrypt        = true
+    profile        = "sso-org-root"
+    dynamodb_table = "[dynamodb_table_name]"
+  }
+```
 
-**AWS credentials 발급**
+###AWS credentials 발급
 
 * 전체 리소스를 생성하기 때문에 우선 Administrator 권한으로 진행하겠습니다
 ```bash
@@ -147,7 +163,7 @@ provider "aws" {
 ```
 * alias를 통해서 여러개의 provider를 지원하여 여러 모듈을 동시에 배포 및 관리할 수 있습니다.
 
-#### Terraform 명령 sample
+### Terraform 명령 sample
 **자주 사용하는 명령어 정리**
 
     1) pluralith plan
