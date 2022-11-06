@@ -121,7 +121,7 @@ aws configure
 aws sso login --profile <profile name>
 ```
 ##### 2. S3, DynamoDB
-S3를 Backend로 사용하는 경우 아래와 같은 설정으로 tfstate 파일 저장이 가능하다. s3의 prefix는 [bucket_name]/env:/[workspace_name]]/terraform/aws-iac-study/terraform.tfstate 형태로 만들어진다. 다만, s3만 사용하는경우 lock을 관리할수 없기 때문에 DynamoDB와 함께 사용이 가능하다.
+S3를 Backend로 사용하는 경우 아래와 같은 설정으로 tfstate 파일 저장이 가능하다. s3의 prefix는 [bucket_name]/env:/[workspace_name]]/terraform/aws-iac-study/terraform.tfstate 형태로 만들어진다. 다만, s3만 사용하는경우 lock을 관리할수 없기 때문에 DynamoDB와 함께 사용해야한다. 이때 일관성에 대하여 신중하게 생각할 필요가 있다.
 ```bash
  backend "s3" {
     bucket         = "[bucket_name]"
