@@ -29,10 +29,8 @@ Terraform Cloud에서 원격으로 Plan, Apply를 진행하기 때문에 AWS cre
 │   └── variables.tf
 └── module ## module directory
     ├── tf101_week3_rds ## 개발중...
-    │   ├── launch_template.tf
-    │   ├── iam.tf
-    │   ├── asg.tf
-    │   ├── alb.tf
+    │   ├── secret_manager.tf
+    │   ├── rds.tf
     │   ├── output.tf
     │   └── variables.tf
     ├── tf101_week2_asg  ## tf101 study 2주차 alb와 asg, ec2를 활용한 간단한 웹 서버를 배포합니다.
@@ -41,7 +39,7 @@ Terraform Cloud에서 원격으로 Plan, Apply를 진행하기 때문에 AWS cre
     │   ├── asg.tf
     │   ├── alb.tf
     │   ├── output.tf
-    │   │   └── variables.tf
+    │   └── variables.tf
     ├── tf101_week1_ec2 ## tf101 study 1주차
     │   ├── main.tf
     │   ├── output.tf
