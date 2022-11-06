@@ -7,17 +7,6 @@ resource "aws_db_subnet_group" "aurora_subnet_group" {
   })
 }
 
-resource "aws_db_security_group" "aurora_sg_group" {
-  name = "tf101-aurora-sg"
-
-  ingress {
-    security_group_id = var.app_sg_id
-  }
-  tags = merge(var.tags, {
-    Name = "tf101-aurora-sg"
-  })
-}
-
 resource "aws_db_parameter_group" "aurora_instance_parameter_group" {
   name   = "aurora-instance-mysql8"
   family = "aurora-mysql8.0"
