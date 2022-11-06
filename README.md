@@ -163,6 +163,25 @@ provider "aws" {
 ```
 * alias를 통해서 여러개의 provider를 지원하여 여러 모듈을 동시에 배포 및 관리할 수 있습니다.
 
+### Terraform workspace사용
+```bash
+##terraform workspace 생성
+$ terraform workspace new sso-org-root
+default
+##terraform workspace list 출력
+$ terraform workspace list
+  default
+  poc
+  sso-org-poc
+* sso-org-root
+##terraform 현재 workspace 출력
+$ terraform workspace show
+sso-org-root
+##terraform workspace 선택
+$ terraform workspace select sso-org-root
+Switched to workspace "sso-org-root".
+```
+
 ### Terraform 명령 sample
 **자주 사용하는 명령어 정리**
 
