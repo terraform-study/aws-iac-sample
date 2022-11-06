@@ -79,4 +79,19 @@ variable "alb_rule" {
     }))
   })
 }
- 
+
+
+variable "aurora_mysql_parameters" {
+  type = object({
+    cluster = list(object({
+      name         = string
+      value        = string
+      apply_method = string
+    }))
+    instance = list(object({
+      name         = string
+      value        = string
+      apply_method = string
+    }))
+  })
+}

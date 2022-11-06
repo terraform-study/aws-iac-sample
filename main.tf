@@ -126,3 +126,27 @@ module "week2_alb_asg" {
   db_subnet_id_1      = module.vpc.db_subnet_id_1
 
 }
+
+module "week3_rds" {
+  source = "./tf101_week3_rds"
+
+  providers = {
+    aws = aws.sso-org-root
+  }
+
+  tags                    = local.tags
+  aws_az                  = var.aws_az
+  region                  = var.region
+  aurora_mysql_parameters = var.aurora_mysql_parameters
+
+
+  vpc_id              = module.vpc.vpc_id
+  public_subnet_id_0  = module.vpc.public_subnet_id_0
+  public_subnet_id_1  = module.vpc.public_subnet_id_1
+  private_subnet_id_0 = module.vpc.private_subnet_id_0
+  private_subnet_id_1 = module.vpc.private_subnet_id_1
+  db_subnet_id_0      = module.vpc.db_subnet_id_0
+  db_subnet_id_1      = module.vpc.db_subnet_id_1
+  app_sg_id           = module.week2_alb_asg.app_sg_id
+
+}

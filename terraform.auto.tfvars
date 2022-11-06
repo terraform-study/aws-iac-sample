@@ -98,3 +98,65 @@ alb_rule = {
     }
   ]
 }
+
+aurora_mysql_parameters = {
+  cluster = [
+    {
+      name         = "character_set_server"
+      value        = "utf8"
+      apply_method = "immediate"
+    },
+    {
+      name         = "character_set_client"
+      value        = "utf8"
+      apply_method = "immediate"
+    },
+    {
+      name         = "performance_schema"
+      value        = "0"
+      apply_method = "pending-reboot"
+    },
+    {
+      name         = "query_cache_type"
+      value        = "0"
+      apply_method = "pending-reboot"
+    },
+  ]
+  "instance" = [
+    {
+      name         = "character_set_server"
+      value        = "utf8"
+      apply_method = "immediate"
+    },
+    {
+      name         = "character_set_client"
+      value        = "utf8"
+      apply_method = "immediate"
+    },
+    {
+      name         = "slow_query_log"
+      value        = "1"
+      apply_method = "immediate"
+    },
+    {
+      name         = "long_query_time"
+      value        = "1"
+      apply_method = "immediate"
+    },
+    {
+      name         = "connect_timeout"
+      value        = "5"
+      apply_method = "immediate"
+    },
+    {
+      name         = "max_connections"
+      value        = "16000"
+      apply_method = "immediate"
+    },
+    {
+      name         = "performance_schema"
+      value        = "0"
+      apply_method = "pending-reboot"
+    },
+  ]
+}

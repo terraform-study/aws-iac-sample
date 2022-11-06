@@ -5,7 +5,11 @@ resource "random_password" "db_pw_random"{
 }
 
 resource "aws_secretsmanager_secret" "secret_password" {
-  name = "aurora-password"
+  name = "tf101-week3-aurora-password"
+
+  tags = merge(var.tags, {
+    Name = "tf101-week3-aurora-password"
+  })
 }
 
 resource "aws_secretsmanager_secret_version" "password" {
