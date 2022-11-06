@@ -27,26 +27,33 @@ Terraform Cloud에서 원격으로 Plan, Apply를 진행하기 때문에 AWS cre
 │   ├── main.tf
 │   ├── output.tf
 │   └── variables.tf
-├── tf101_week3_rds ## 개발중...
-├── tf101_week2_asg ## tf101 study 2주차 alb와 asg, ec2를 활용한 간단한 웹 서버를 배포합니다.
-│   ├── launch_template.tf
-│   ├── iam.tf
-│   ├── asg.tf
-│   ├── alb.tf
-│   ├── output.tf
-│   └── variables.tf
-├── tf101_week1_ec2 ## tf101 study 1주차
-│   ├── main.tf
-│   ├── output.tf
-│   └── variables.tf
-├── sg ## 공통 SG그룹 생성 모듈
-│   ├── main.tf
-│   ├── output.tf
-│   └── variables.tf
-└── vpc
-    ├── main.tf
-    ├── output.tf
-    └── variables.tf
+└── module ## module directory
+    ├── tf101_week3_rds ## 개발중...
+    │   ├── launch_template.tf
+    │   ├── iam.tf
+    │   ├── asg.tf
+    │   ├── alb.tf
+    │   ├── output.tf
+    │   └── variables.tf
+    ├── tf101_week2_asg  ## tf101 study 2주차 alb와 asg, ec2를 활용한 간단한 웹 서버를 배포합니다.
+    │   ├── launch_template.tf
+    │   ├── iam.tf
+    │   ├── asg.tf
+    │   ├── alb.tf
+    │   ├── output.tf
+    │   │   └── variables.tf
+    ├── tf101_week1_ec2 ## tf101 study 1주차
+    │   ├── main.tf
+    │   ├── output.tf
+    │   └── variables.tf
+    ├── sg ## 공통 SG그룹 생성 모듈
+    │   ├── main.tf
+    │   ├── output.tf
+    │   └── variables.tf
+    └── vpc
+        ├── main.tf
+        ├── output.tf
+        └── variables.tf
 ```
 
 ### Requirement

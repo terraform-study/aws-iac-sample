@@ -52,7 +52,7 @@ provider "aws" {
 
 
 module "vpc" {
-  source = "./vpc"
+  source = "./module/vpc"
 
   providers = {
     aws = aws.sso-org-root
@@ -69,7 +69,7 @@ module "vpc" {
 }
 
 module "security_group" {
-  source = "./sg"
+  source = "./module/sg"
 
   providers = {
     aws = aws.sso-org-root
@@ -83,7 +83,7 @@ module "security_group" {
 }
 
 module "week1_ec2_web" {
-  source = "./tf101_week1_ec2"
+  source = "./module/tf101_week1_ec2"
 
   providers = {
     aws = aws.sso-org-root
@@ -106,7 +106,7 @@ module "week1_ec2_web" {
 }
 
 module "week2_alb_asg" {
-  source = "./tf101_week2_asg"
+  source = "./module/tf101_week2_asg"
 
   providers = {
     aws = aws.sso-org-root
@@ -128,7 +128,7 @@ module "week2_alb_asg" {
 }
 
 module "week3_rds" {
-  source = "./tf101_week3_rds"
+  source = "./module/tf101_week3_rds"
 
   providers = {
     aws = aws.sso-org-root
