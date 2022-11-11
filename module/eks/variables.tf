@@ -1,38 +1,38 @@
-ariable "tags" {
-
-}
-
-variable "aws_az" {
-  type    = list(any)
-  default = ["ap-northeast-2a", "ap-northeast-2c"]
+variable "aws_console_role" {
+  description = "This role will be added to the kubernetes clusters admin users"
+  default     = "IibsAdminAccess-DO-NOT-DELETE"
 }
 
 variable "region" {
-  type    = string
+  type = string
   default = "ap-northeast-2"
 }
 
-variable "vpc_id" {
-  type = string
+variable "cluster_name" {}
+
+variable "subnet_ids" {}
+
+variable "cluster_version" {
+  default = "1.23"
 }
 
-
-variable "vpc_cidr" {
-  type = string
+variable "node_group_instance_types" {
+  default = ["m5.large"]
 }
 
-variable "public_subnet_id_0" {
-  type = string
+variable "node_group_desired_size" {
+  default = 1
 }
 
-variable "public_subnet_id_1" {
-  type = string
+variable "node_group_max_size" {
+  default = 1
 }
 
-variable "private_subnet_id_0" {
-  type = string
+variable "node_group_min_size" {
+  default = 1
 }
 
-variable "private_subnet_id_1" {
-  type = string
+variable "node_group_max_unavailable" {
+  default = 1
 }
+

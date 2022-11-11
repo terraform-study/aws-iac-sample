@@ -50,7 +50,6 @@ provider "aws" {
 
 }
 
-
 module "vpc" {
   source = "./module/vpc"
 
@@ -67,6 +66,53 @@ module "vpc" {
   db_subnet      = var.db_subnet
   vpc_cidr       = var.vpc_cidr
 }
+
+module "eks_cluster" {
+  source = "./module/eks"
+
+  providers = {
+    aws = aws.sso-org-root
+  }
+
+  region                  = var.region
+  cluster_name            = "cluster"
+  subnet_ids              = [module.vpc.public_subnet_id_0, module.vpc.public_subnet_id_1]
+  node_group_desired_size = 3
+  node_group_max_size     = 3
+  node_group_min_size     = 3
+  depends_on = [
+    module.vpc
+  ]
+}
+
+# provider "kubernetes" {
+#   alias                  = "eks-cluster"
+#   host                   = module.eks_cluster.host
+#   cluster_ca_certificate = module.eks_cluster.cluster_ca_certificate
+#   token                  = module.eks_cluster.token
+# }
+
+# provider "helm" {
+#   alias = "eks-cluster"
+#   kubernetes {
+#     host                   = module.eks_cluster.host
+#     cluster_ca_certificate = module.eks_cluster.cluster_ca_certificate
+#     token                  = module.eks_cluster.token
+#   }
+# }
+
+
+
+# module "cluster_istio" {
+#   source = "./module/eks_istio"
+#   providers = {
+#     kubernetes = kubernetes.eks-cluster
+#     helm       = helm.eks-cluster
+#   }
+#   depends_on = [
+#     module.eks_cluster
+#   ]
+# }
 
 module "security_group" {
   source = "./module/sg"
@@ -93,6 +139,7 @@ module "week1_ec2_web" {
   aws_az            = var.aws_az
   vpc_cidr          = var.vpc_cidr
   sg_rule           = var.sg_rule
+  region            = var.region
   tf101_server_port = var.tf101_server_port
 
   vpc_id                = module.vpc.vpc_id
