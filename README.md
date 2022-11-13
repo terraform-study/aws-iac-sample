@@ -28,6 +28,12 @@ Terraform Cloud에서 원격으로 Plan, Apply를 진행하기 때문에 AWS cre
 │   ├── output.tf
 │   └── variables.tf
 └── module ## module directory
+    ├── eks ## eks cluster 구축
+    │   ├── main.tf
+    │   ├── output.tf
+    │   └── variables.tf
+    ├── eks_istio ## kubernetes 접속및 istio helm 설치
+    │   ├── main.tf
     ├── tf101_week3_rds ## 개발중...
     │   ├── secret_manager.tf
     │   ├── rds.tf
@@ -168,6 +174,26 @@ provider "aws" {
 ```
 * alias를 통해서 여러개의 provider를 지원하여 여러 모듈을 동시에 배포 및 관리할 수 있습니다.
 
+```hcl
+provider "kubernetes" {
+  alias                  = "eks-cluster"
+  host                   = module.eks_cluster.host
+  cluster_ca_certificate = module.eks_cluster.cluster_ca_certificate
+  token                  = module.eks_cluster.token
+}
+
+provider "helm" {
+  alias = "eks-cluster"
+  kubernetes {
+    host                   = module.eks_cluster.host
+    cluster_ca_certificate = module.eks_cluster.cluster_ca_certificate
+    token                  = module.eks_cluster.token
+  }
+}
+```
+* kubernetes와 helm provider를 추가하여 eks생성과 후 셋팅을 전부 할 수 있다.
+* IAM 등록과 Add-on 설치는 작업중...
+
 ### Terraform workspace사용
 ```bash
 ##terraform workspace 생성
@@ -267,8 +293,8 @@ Global options (use these before the subcommand, if any):
 
 **TO-DO List**
 
-- [ ] EKS launch_template 생성
-- [ ] EKS Cluster 생성
+- [x] EKS launch_template 생성
+- [x] EKS Cluster 생성
 - [ ] IRSA 구성
 - [ ] 기본 서비스 배포
 - [ ] cdktf로 컨버팅
