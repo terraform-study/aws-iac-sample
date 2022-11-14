@@ -85,12 +85,12 @@ module "eks_cluster" {
   ]
 }
 
-# provider "kubernetes" {
-#   alias                  = "eks-cluster"
-#   host                   = module.eks_cluster.host
-#   cluster_ca_certificate = module.eks_cluster.cluster_ca_certificate
-#   token                  = module.eks_cluster.token
-# }
+provider "kubernetes" {
+  alias                  = "eks-cluster"
+  host                   = module.eks_cluster.host
+  cluster_ca_certificate = module.eks_cluster.cluster_ca_certificate
+  token                  = module.eks_cluster.token
+}
 
 # provider "helm" {
 #   alias = "eks-cluster"
@@ -100,8 +100,6 @@ module "eks_cluster" {
 #     token                  = module.eks_cluster.token
 #   }
 # }
-
-
 
 # module "cluster_istio" {
 #   source = "./module/eks_istio"
