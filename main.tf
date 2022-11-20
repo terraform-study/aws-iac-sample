@@ -183,6 +183,7 @@ module "week3_rds" {
   aws_az                  = var.aws_az
   region                  = var.region
   aurora_mysql_parameters = var.aurora_mysql_parameters
+  db_name = var.db_name
 
 
   vpc_id              = module.vpc.vpc_id

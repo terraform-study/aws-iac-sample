@@ -8,6 +8,12 @@ variable "aws_az_des" {
   default = ["apn2a", "apn2c"]
 }
 
+variable "db_name" {
+  description = "The name to use for the database"
+  type        = string
+  default     = "sample-db-name"
+}
+
 variable "region" {
   type    = string
   default = "ap-northeast-2"

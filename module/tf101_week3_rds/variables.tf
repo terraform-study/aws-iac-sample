@@ -2,6 +2,12 @@ variable "tags" {
 
 }
 
+variable "db_name" {
+  description = "The name to use for the database"
+  type        = string
+  default     = "sample-db-name"
+}
+
 variable "aws_az" {
   type    = list(any)
   default = ["ap-northeast-2a", "ap-northeast-2c"]
