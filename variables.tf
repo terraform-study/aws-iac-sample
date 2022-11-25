@@ -101,3 +101,15 @@ variable "aurora_mysql_parameters" {
     }))
   })
 }
+
+variable "vault_addr" {
+  description = "Vault Server address format : http://IP_ADDRES:8200"
+  default     = "http://127.0.0.1:8200"
+}
+
+variable login_approle_role_id {
+  description = "AppRole ID Value"
+}
+variable login_approle_secret_id {
+  description = "AppRole Secret ID Value"
+}

@@ -1,9 +1,9 @@
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
-  name: eks-122
+  name: learn-vault
   region: ap-northeast-2
-  version: "1.22"
+  version: "1.23"
 
 nodeGroups:
   - name: ng-1
@@ -11,8 +11,24 @@ nodeGroups:
     desiredCapacity: 3
     volumeSize: 100
     volumeType: gp3
-  - name: ng-2
-    instanceType: m5.xlarge
-    desiredCapacity: 3
-    volumeSize: 100
-    volumeType: gp3
+    iam:
+      withAddonPolicies:
+        ebs: true
+        efs: true
+        albIngress: true
+        cloudWatch: true
+        awsLoadBalancerController: true
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+    ssh:
+      enableSsm: true
+    privateNetworking: true
+    enableDetailedMonitoring: true
+
+# To enable all of the control plane logs, uncomment below:
+cloudWatch:
+  clusterLogging:
+    enableTypes: ["*"]

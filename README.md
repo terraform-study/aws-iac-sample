@@ -194,6 +194,145 @@ provider "helm" {
 * kubernetes와 helm provider를 추가하여 eks생성과 후 셋팅을 전부 할 수 있다.
 * IAM 등록과 Add-on 설치는 작업중...
 
+#### Hashicorp Vault local
+로컬에서 테스트를 해야하는 경우 Dev서버를 띄워서 할수 있다
+```bash
+vault server -dev
+==> Vault server configuration:
+
+            Api Address: http://127.0.0.1:8200
+                     Cgo: disabled
+         Cluster Address: https://127.0.0.1:8201
+            Go Version: go1.19.1
+            Listener 1: tcp (addr: "127.0.0.1:8200", cluster address: "127.0.0.1:8201", max_request_duration: "1m30s", max_request_size: "33554432", tls: "disabled")
+               Log Level: info
+                  Mlock: supported: false, enabled: false
+         Recovery Mode: false
+               Storage: inmem
+               Version: Vault v1.13.0-dev1, built 2022-09-26T14:39:49Z
+            Version Sha: 2a7c3f2f76e6fd6a7f8622ea68d82bcf9dcf9686
+
+==> Vault server started! Log data will stream in below:
+
+# ...snip...
+
+WARNING! dev mode is enabled! In this mode, Vault runs entirely in-memory
+and starts unsealed with a single unseal key. The root token is already
+authenticated to the CLI, so you can immediately begin using Vault.
+
+You may need to set the following environment variables:
+
+   $ export VAULT_ADDR='http://127.0.0.1:8200'
+
+The unseal key and root token are displayed below in case you want to
+seal/unseal the Vault or re-authenticate.
+
+Unseal Key: xxxxx
+Root Token: xxx
+
+Development mode should NOT be used in production installations!
+
+export VAULT_ADDR='http://127.0.0.1:8200'
+export VAULT_TOKEN="xxx"
+```
+위처럼 환경변수를 지정해 주어야 한다. 만약 auti.tfvars에 그대로 입력할 경우 보안 토큰이 노출되게 된다.
+
+role은 기본적으로 administrator로 지정된다. 상단의 token을 secret_id에 주입해주면 정상적으로 provider가 생성된다.
+```hcl
+provider "vault" {
+  address = "https://localhost:8000"
+
+  auth_login {
+  path = "auth/approle/login"
+  parameters = {
+    role_id   = var.login_approle_role_id
+    secret_id = var.login_approle_secret_id
+  }
+ }
+}
+
+provider "aws" {
+  region     = var.region
+  access_key = data.vault_aws_access_credentials.creds.access_key
+  secret_key = data.vault_aws_access_credentials.creds.secret_key
+  token      = data.vault_aws_access_credentials.creds.security_token
+}
+```
+#### Hashicorp Vault on Amazon EKS(테스트중)
+* 보안이 필요한 문자를 저장하기 위해 EKS에 Vault를 설치하여 사용함.
+
+##### prerequisites
+```bash
+brew install awscli
+brew install eksctl
+brew install kubernetes-cli
+brew install helm
+
+eksctl create cluster -f cluster.yaml
+```
+위의 명령어를 사용하여 클러스터를 먼저 배포한다. vault는 리소스를 많이 사용하니 large 이상의 type을 사용하길 권장한다. 우선 사전에 EBS CSI를 설치해 놓고 시작해야 한다. MySQL이 EBS를 사용한다.
+다음은 데이터를 저장할 mysql을 설치한다.
+```bash
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm install mysql bitnami/mysql
+
+##설치 완료후 아래의 명령어로 비밀번호를 변수로 저장해 놓아야 한다
+ROOT_PASSWORD=$(kubectl get secret --namespace default mysql -o jsonpath="{.data.mysql-root-password}" | base64 --decode)
+```
+저장소 설치가 완료되면 실제 vault를 설치한다
+```bash
+helm repo add hashicorp https://helm.releases.hashicorp.com
+
+helm repo update
+
+helm install vault hashicorp/vault \
+    --set='server.ha.enabled=true' \
+    --set='server.ha.raft.enabled=true'
+
+## 전부 설치가 완료되면 아래와 같이 파드가 생성된다. Ready가 0/1이지만 실제 exec로 접근된다. 이것은 실제로 정상 동작은 하지만 readinessprove에서 return을 0이 아닌값을 주기 때문이다.
+NAME                                    READY   STATUS    RESTARTS   AGE
+mysql-0                                 0/1     Pending   0          2m14s
+vault-0                                 0/1     Pending   0          11s
+vault-1                                 0/1     Pending   0          11s
+vault-2                                 0/1     Pending   0          11s
+vault-agent-injector-58f49698bc-9xdnv   1/1     Running   0          11s
+
+## vault-0 settion
+kubectl exec vault-0 -- vault operator init \
+    -key-shares=1 \
+    -key-threshold=1 \
+    -format=json > cluster-keys.json
+VAULT_UNSEAL_KEY=$(cat cluster-keys.json | jq -r ".unseal_keys_b64[]")
+kubectl exec vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY
+CLUSTER_ROOT_TOKEN=$(cat cluster-keys.json | jq -r ".root_token")
+kubectl exec vault-0 -- vault login $CLUSTER_ROOT_TOKEN
+
+## vault 1 join
+kubectl exec vault-1 -- vault operator raft join http://vault-0.vault-internal:8200
+kubectl exec vault-1 -- vault operator unseal $VAULT_UNSEAL_KEY
+
+## vault 2 join
+kubectl exec vault-2 -- vault operator raft join http://vault-0.vault-internal:8200
+kubectl exec vault-2 -- vault operator unseal $VAULT_UNSEAL_KEY
+
+## Database enable
+kubectl exec vault-0 -- vault secrets enable database
+kubectl exec vault-0 -- vault write database/config/mysql \
+    plugin_name=mysql-database-plugin \
+    connection_url="{{username}}:{{password}}@tcp(mysql.default.svc.cluster.local:3306)/" \
+    allowed_roles="readonly" \
+    username="root" \
+    password="$ROOT_PASSWORD"
+
+kubectl exec vault-0 -- vault write database/roles/readonly \
+    db_name=mysql \
+    creation_statements="CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}';GRANT SELECT ON *.* TO '{{name}}'@'%';" \
+    default_ttl="1h" \
+    max_ttl="24h"
+
+kubectl exec vault-0 -- vault read database/creds/readonly
+```
+
 ### Terraform workspace사용
 ```bash
 ##terraform workspace 생성

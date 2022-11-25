@@ -19,6 +19,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 3.0"
     }
+    vault = {
+      source  = "hashicorp/vault"
+      version = "~> 2.0"
+    }
   }
   #terrafform cloud backend
   #   backend "remote" {
@@ -50,6 +54,20 @@ provider "aws" {
 
 }
 
+provider "vault" {
+  # default address = "https://localhost:8000"
+  address = var.vault_addr
+
+  
+  auth_login {
+  path = "auth/approle/login"
+  parameters = {
+    role_id   = var.login_approle_role_id
+    secret_id = var.login_approle_secret_id
+  }
+ }
+}
+
 module "vpc" {
   source = "./module/vpc"
 
@@ -76,7 +94,7 @@ module "eks_cluster" {
 
   region                  = var.region
   cluster_name            = "cluster"
-  subnet_ids              = [module.vpc.public_subnet_id_0, module.vpc.public_subnet_id_1]
+  subnet_ids              = [module.vpc.private_subnet_id_0, module.vpc.private_subnet_id_1]
   node_group_desired_size = 3
   node_group_max_size     = 3
   node_group_min_size     = 3
